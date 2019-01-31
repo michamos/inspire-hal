@@ -1,0 +1,48 @@
+# License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with INSPIRE. If not, see <http://www.gnu.org/licenses/>.
+#
+# In applying this license, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization
+# or submit itself to any jurisdiction.
+
+notifications:
+  email: false
+
+sudo: false
+
+language: python
+
+cache: pip
+
+python:
+  - 2.7
+  - 3.6
+
+matrix:
+  fast_finish: true
+
+before_install:
+  - travis_retry pip install --upgrade pip setuptools
+  - travis_retry pip install coveralls
+
+install:
+  - travis_retry pip install -r requirements.txt
+  - travis_retry pip install -e .
+
+script:
+  - ./run-tests.sh
+
+after_success:
+  - coveralls
+
+deploy:
+  provider: pypi
+  user: inspirehep
+  password:
+    secure: "3hun5oGJvBcohSdnPfIQa5+zp3Xuze0mUk2k0xGrKxG//aKf5uo6Fobf18oeDlvyPS/3lEOZFnwlk52VV4oxdmpzdG4qsKPQnHdXnM2GHJkTYKO2qjgyXRBxYEQK6CgkI83iEt4ZETW20fIeStySKHcdYOVmBZp7xFnuSNQm5fB3iZ7yR2nS7HUiTPnUg3D3UzSOY4694Mlzt81mnpxiU8rXRqRHJF4JPzQhHreIuDKnPgt8JrEuggKO1CMHxNu6ZVi159TxXc3Fyba+jRz5LgdFpIGyz4OIuvPa6Yy3ifoFoVRixOTBOEdwIJkLWCZ4XCJshUxCf6mJA8h2hv7P0DWliBNVOzi4IM2llNruIuGJXrjO5krTR4TDFUhgr0sRXR2ipdvr8RKex3OIVRw2L2WzOcVa6UahqWRa/VOvC9znRQ5OSqz+ykcVvEcxLZ5tlSpZOQgWCL/RLqIxeFXTk2LGyIHCByjI0v0ng7WJn7jili14sQ9+TH1SLzEkLBNj8RXHvgPxrX/bhgDV6ltwH5XbFON2TNiMRobMkWcpsv+Tf4AwJRb9nCVHLWZoPahKJhrpsWtn0bivee9BeqHqQxU9BuoIOC3HAfKqvBQmj/l2/Mwz7L2SJ3v/a2heBUQG0IKw5MxDRtKXKI5XoueApFRsnYWGv3TYThdM1p+dHQE="
+  on:
+    branch: master
+    python: 2.7
+  distribution: sdist
