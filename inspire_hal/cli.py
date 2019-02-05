@@ -62,10 +62,10 @@ def push():
     db_user = get_env_var(app, 'DB_INSPIRE_USER')
     db_pass = get_env_var(app, 'DB_INSPIRE_PASSWORD')
     db_port = get_env_var(app, 'DB_PORT')
-    db_uri = get_env_var(app, 'DB_REPLICA')
+    db_uri = get_env_var(app, 'PROD_DB_HOST')
 
-    limit = app.config.get('LIMIT', 0)
-    yield_amt = app.config.get('YIELD_AMT', 100)
+    limit = app.config.get('HAL_LIMIT', 0)
+    yield_amt = app.config.get('HAL_YIELD_AMT', 100)
 
     db_resource = 'postgresql+psycopg2://{}:{}@{}:{}/inspirehep'.\
         format(db_user, db_pass, db_uri, db_port)

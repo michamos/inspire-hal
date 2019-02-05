@@ -63,7 +63,6 @@ def run(limit, yield_amt):
                 tei = convert_to_tei(record)
             except Exception as e:
                 print('EXC TEI: %s %s\n' % (record['control_number'], str(e)))
-                # ko.append(record['control_number'])
                 ko += 1
                 continue
 
@@ -91,11 +90,10 @@ def run(limit, yield_amt):
                     continue
 
             if success:
-                # ok.append(record['control_number'])
+                print ('%s) OK %s\n' % (total, record['control_number']))
                 ok += 1
             else:
-                print('EXC HAL: %s %s\n' % (record['control_number'], str(e)))
-                # ko.append(record['control_number'])
+                print('%s) EXC HAL: %s %s\n' % (total, record['control_number'], str(e)))
                 ko += 1
 
     return total, now, ok, ko

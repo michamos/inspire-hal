@@ -28,29 +28,13 @@ from flask import render_template
 from langdetect import detect
 from langdetect.lang_detect_exception import LangDetectException
 
-from inspire_schemas.readers import LiteratureReader
+from inspire_schemas.readers import ConferenceReader, LiteratureReader
 
 from ..utils import (
     get_authors,
-    get_conference_city,
-    get_conference_country,
-    get_conference_end_date,
     get_conference_record,
-    get_conference_start_date,
-    get_conference_title,
     get_divulgation,
-    get_document_types,
-    get_doi,
     get_domains,
-    get_inspire_id,
-    get_journal_issue,
-    get_journal_title,
-    get_journal_volume,
-    get_language,
-    get_page_artid,
-    get_peer_reviewed,
-    get_publication_date,
-    is_published,
 )
 
 
@@ -84,57 +68,55 @@ def convert_to_tei(record):
 
 
 def _is_comm(record):
-    document_types = get_document_types(record)
+    document_types = LiteratureReader(record).document_types
 
     return 'conference paper' in document_types
 
 
 def _get_comm_context(record):
-    reader = LiteratureReader(record)
-    abstract = reader.abstract
+    lit_reader = LiteratureReader(record)
+    conf_reader = ConferenceReader(record)
+    abstract = lit_reader.abstract
     try:
         abstract_language = detect(abstract)
     except LangDetectException:
         abstract_language = ''
 
     conference_record = get_conference_record(record)
-    conference_city = get_conference_city(conference_record)
-    conference_country = get_conference_country(conference_record)
-    conference_end_date = get_conference_end_date(conference_record)
-    conference_start_date = get_conference_start_date(conference_record)
-    conference_title = get_conference_title(conference_record)
+    conference_title = LiteratureReader(conference_record).title
 
     return {
         'abstract': abstract,
         'abstract_language': abstract_language,
-        'arxiv_id': reader.arxiv_id,
+        'arxiv_id': lit_reader.arxiv_id,
         'authors': get_authors(record),
-        'collaborations': reader.collaborations,
-        'conference_city': conference_city,
-        'conference_country': conference_country,
-        'conference_end_date': conference_end_date,
-        'conference_start_date': conference_start_date,
+        'collaborations': lit_reader.collaborations,
+        'conference_city': conf_reader.city,
+        'conference_country': conf_reader.country,
+        'conference_end_date': conf_reader.end_date,
+        'conference_start_date': conf_reader.start_date,
         'conference_title': conference_title,
         'divulgation': get_divulgation(record),
-        'doi': get_doi(record),
+        'doi': lit_reader.doi,
         'domains': get_domains(record),
-        'inspire_id': get_inspire_id(record),
-        'journal_issue': get_journal_issue(record),
-        'journal_title': get_journal_title(record),
-        'journal_volume': get_journal_volume(record),
-        'keywords': reader.keywords,
-        'language': get_language(record),
-        'page_artid': get_page_artid(record),
-        'peer_reviewed': get_peer_reviewed(record),
-        'publication_date': get_publication_date(record),
-        'subtitle': reader.subtitle,
-        'title': reader.title,
+        'inspire_id': lit_reader.inspire_id,
+        'journal_issue': lit_reader.journal_issue,
+        'journal_title': lit_reader.journal_title,
+        'journal_volume': lit_reader.journal_volume,
+        'keywords': lit_reader.keywords,
+        'language': lit_reader.language,
+        'page_artid': lit_reader.get_page_artid(),
+        'peer_reviewed': 1 if lit_reader.peer_reviewed else 0,
+        'publication_date': lit_reader.publication_date,
+        'subtitle': lit_reader.subtitle,
+        'title': lit_reader.title,
     }
 
 
 def _is_art(record):
-    document_types = get_document_types(record)
-    published = is_published(record)
+    reader = LiteratureReader(record)
+    document_types = reader.document_types
+    published = reader.is_published
 
     return 'article' in document_types and published
 
@@ -155,25 +137,23 @@ def _get_art_context(record):
         'authors': get_authors(record),
         'collaborations': reader.collaborations,
         'divulgation': get_divulgation(record),
-        'doi': get_doi(record),
+        'doi': reader.doi,
         'domains': get_domains(record),
-        'inspire_id': get_inspire_id(record),
-        'journal_issue': get_journal_issue(record),
-        'journal_title': get_journal_title(record),
-        'journal_volume': get_journal_volume(record),
+        'inspire_id': reader.inspire_id,
+        'journal_issue': reader.journal_issue,
+        'journal_title': reader.journal_title,
+        'journal_volume': reader.journal_volume,
         'keywords': reader.keywords,
-        'language': get_language(record),
-        'page_artid': get_page_artid(record),
-        'peer_reviewed': get_peer_reviewed(record),
-        'publication_date': get_publication_date(record),
+        'language': reader.get_page_artid(),
+        'peer_reviewed': 1 if reader.peer_reviewed else 0,
+        'publication_date': reader.publication_date,
         'subtitle': reader.subtitle,
         'title': reader.title,
     }
 
 
 def _is_preprint(record):
-    document_types = get_document_types(record)
-
+    document_types = LiteratureReader(record).document_types
     return 'article' in document_types
 
 
@@ -193,9 +173,9 @@ def _get_preprint_context(record):
         'collaborations': reader.collaborations,
         'divulgation': get_divulgation(record),
         'domains': get_domains(record),
-        'inspire_id': get_inspire_id(record),
+        'inspire_id': reader.inspire_id,
         'keywords': reader.keywords,
-        'language': get_language(record),
+        'language': reader.language,
         'subtitle': reader.subtitle,
         'title': reader.title,
     }
