@@ -96,4 +96,4 @@ def run(limit, yield_amt):
                 print('%s) EXC HAL: %s %s\n' % (total, record['control_number'], str(e)))
                 ko += 1
 
-    return total, now, ok, ko
+    return total + 1, now, ok, ko

@@ -30,8 +30,8 @@ import sys
 from invenio_base.app import create_app_factory
 from invenio_config import create_config_loader
 
-from . import config
-
+from inspire_hal.cli import hal
+from inspire_hal import config
 
 env_prefix = 'APP'
 
@@ -40,6 +40,7 @@ def config_loader(app, **kwargs_config):
     invenio_config_loader = create_config_loader(config=config, env_prefix=env_prefix)
     result = invenio_config_loader(app, **kwargs_config)
     app.url_map.strict_slashes = False
+    app.cli.add_command(hal)
     return result
 
 
@@ -57,3 +58,4 @@ create_app = create_app_factory(
     extension_entry_points=['invenio_base.apps'],
     instance_path=instance_path,
 )
+

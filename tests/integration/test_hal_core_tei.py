@@ -24,13 +24,12 @@ from __future__ import absolute_import, division, print_function
 
 import os
 
+from invenio_db import db
+from invenio_records.api import RecordMetadata
 import pkg_resources
 import pytest
 from lxml import etree
-
-from invenio_db import db
-from invenio_records.api import RecordMetadata
-from invenio_search.api import current_search_client as es
+from sqlalchemy import update
 
 from inspire_hal.core.tei import convert_to_tei
 from inspire_hal.utils import get_db_records
@@ -44,16 +43,13 @@ def cern_with_hal_id(app):
     record = RecordMetadata(record)
     db.session.add(record)
     db.session.commit()
-    es.indices.refresh('records-institutions')
 
     yield
 
     record = get_db_records[('ins', 902725)]
     del record.json['external_system_identifiers']
-    from sqlalchemy import update
     update(RecordMetadata).where(RecordMetadata.id == record.id).values(json=record.json)
     db.session.commit()
-    es.indices.refresh('records-institutions')
 
 
 def test_convert_to_tei(app, create_record_from_fixture, delete_record):

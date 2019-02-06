@@ -35,7 +35,28 @@ setup_requires = [
     'autosemver~=0.0,>=0.5.3',
 ]
 
-install_requires = []
+install_requires = [
+    'celery~=4.0,>=4.1.0,<4.2.0',
+    'Flask~=0.0,>=0.12.4',
+    'Flask-CeleryExt~=0.0,>=0.3.1',
+    'httplib2~=0.0,>=0.12.0',
+    'inspire-dojson~=61.0,>=61.0.0',
+    'inspire-schemas~=59.0,>=59.2.0',
+    'inspire-utils~=3.0,>=3.0.0',
+    'flask-shell-ipython<0.4.0',
+    'invenio-app~=1.0,>=1.0.0',
+    'invenio-base~=1.0,>=1.0.0',
+    'invenio-config~=1.0,>=1.0.0',
+    'invenio-db[postgresql,versioning]~=1.0,>=1.0.0',
+    'invenio-pidstore==1.0.0',
+    'invenio-records~=1.0,>=1.0.0',
+    'langdetect~=1.0,>=1.0.7',
+    'redis~=2.0,>=2.10.6',
+    'SQLAlchemy~=1.0,>=1.2.5',
+    'sword2~=0.0,>=0.2.1',
+    'urllib3==1.23',
+    'zulip==0.5.8',
+]
 
 docs_require = []
 
@@ -81,6 +102,9 @@ setup(
     install_requires=install_requires,
     tests_require=tests_require,
     extras_require=extras_require,
+    entry_points={
+        "console_scripts": ["inspirehal = inspire_hal:cli"],
+    },
     classifiers=[
         'Development Status :: 1 - Planning',
         'Environment :: Web Environment',

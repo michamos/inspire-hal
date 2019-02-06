@@ -24,23 +24,16 @@
 
 from __future__ import absolute_import, division, print_function
 
-import datetime
-import os
-import socket
-
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import zulip
 
 from inspire_hal.bulk_push import run
 
 
-def hal_push(limit, yield_amt, mailing_list=None):
+def hal_push(limit, yield_amt):
     """Run a hal push."""
 
     print('HAL: Starting to process HAL records')
-    if mailing_list:
-        send_hal_push_start_email(mailing_list)
+    send_start_message()
 
     total, now, ok, ko = run(
         limit=limit,
@@ -51,92 +44,40 @@ def hal_push(limit, yield_amt, mailing_list=None):
         'HAL: Finished, %s records processed in %s: %s ok, %s ko'
         % (total, now, ok, ko)
     )
-    if mailing_list:
-        send_hal_push_summary_email(
-            mailing_list=mailing_list,
-            total=total,
-            ok=ok,
-            now=now,
-            ko=ko,
-        )
+    send_summary(
+        total=total,
+        ok=ok,
+        now=now,
+        ko=ko,
+    )
 
 
-def send_hal_push_start_email(mailing_list):
-    host = socket.gethostname()
-    body = '''
-Hi!!
-
-Hal push just started to run in host %s, you should receive an email once it's
-finished too with the logs.
-
-Cheers!
-The Inspire developers team
-    ''' % (host)
-    message = MIMEText(body)
-    timestamp = datetime.datetime.now().strftime('[%Y/%m/%d-%H:%M:%S]')
-    message['Subject'] = 'Hal push starting at %s' % timestamp
-    message['From'] = 'inspire-halpush@cern.ch'
-    message['To'] = mailing_list
-
-    cli = smtplib.SMTP('localhost')
-    try:
-        cli.sendmail(
-            from_addr=message['From'],
-            to_addrs=[message['To']],
-            msg=message.as_string(),
-        )
-    finally:
-        cli.close()
+def send_start_message():
+    message = '''Hal push **started**! :rocket:'''
+    send_to_zulip(message)
 
 
-def send_hal_push_summary_email(mailing_list, total, ok, now, ko, attached_files=None):
-    """Sends a nice email with the summary of the hal push.
-    """
-    body = MIMEText('''
-The hal push has finished!
+def send_summary(total, ok, now, ko):
+    summary = '''Hal push has **finished**!
 
-We processed %s records in %s: %s ok, %s ko.
+Processed %s records in %s
+* %s succeded 
+* %s failed
+    ''' % (total, now, ok, ko)
+    send_to_zulip(summary)
 
-There's (or should be) some logs attached to this email.
 
+def send_to_zulip(message):
+    client = zulip.Client()
 
-Enjoy!
-    ''' % (total, now, ok, ko))
-    body.add_header('Content-type', 'text/plain')
-
-    message = MIMEMultipart()
-    timestamp = datetime.datetime.now().strftime('[%Y/%m/%d-%H:%M:%S]')
-    message['Subject'] = 'Hal push finished at %s' % timestamp
-    message['From'] = 'inspire-halpush@cern.ch'
-    message['To'] = mailing_list
-
-    message.attach(body)
-
-    cli = smtplib.SMTP('localhost')
-
-    for file_name in attached_files:
-        if not os.path.exists(file_name):
-            print(
-                'HAL: Unable to find file %s to attach to deploy end email.' %
-                file_name
-            )
-            continue
-
-        with open(file_name, 'rb') as file_fd:
-            attached_file = MIMEText(file_fd.read())
-
-        attached_file.add_header(
-            'Content-Disposition',
-            'attached',
-            filename=file_name,
-        )
-        message.attach(attached_file)
-
-    try:
-        cli.sendmail(
-            from_addr=message['From'],
-            to_addrs=[message['To']],
-            msg=message.as_string(),
-        )
-    finally:
-        cli.close()
+    request = {
+        "type":    "stream",
+        "to":      "ops",
+        "subject": "HAL PUSH",
+        "content": message,
+    }
+    response = client.send_message(request)
+    if response.get("result") == "success":
+        print ('New message sent to Zulip/ops/HAL_PUSH')
+    else:
+        print("Error sending the message to Zulip: %s" % response)

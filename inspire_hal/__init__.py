@@ -23,3 +23,8 @@
 """Inspire service for pushing records to HAL"""
 
 from __future__ import absolute_import, division, print_function
+
+from inspire_hal.factory import create_app
+from invenio_base.app import create_cli
+
+cli = create_cli(create_app=create_app)

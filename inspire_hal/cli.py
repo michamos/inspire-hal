@@ -27,13 +27,15 @@ import sys
 
 import click
 
-from inspire_hal.factory import create_app
+from flask import current_app
+from flask.cli import with_appcontext
+
 from inspire_hal.tasks import hal_push
 
 
-def get_env_var(app, var_name):
+def get_env_var(var_name):
     try:
-        value = app.config[var_name]
+        value = current_app.config[var_name]
         return value
     except KeyError:
         print("Environment variable '{}' not set. Quitting.".format(var_name))
@@ -42,11 +44,11 @@ def get_env_var(app, var_name):
 
 @click.group()
 def hal():
-    """CLI for pushing to HAL."""
     pass
 
 
 @hal.command()
+@with_appcontext
 def push():
     """Push to HAL api.
 
@@ -55,35 +57,28 @@ def push():
     """
     print('Loading credentials and settings from local environment')
 
-    app = create_app()
+    username = get_env_var('HAL_USER_NAME')
+    password = get_env_var('HAL_USER_PASS')
+    db_user = get_env_var('DB_INSPIRE_USER')
+    db_pass = get_env_var('DB_INSPIRE_PASSWORD')
+    db_port = get_env_var('DB_PORT')
+    db_uri = get_env_var('PROD_DB_HOST')
 
-    username = get_env_var(app, 'HAL_USER_NAME')
-    password = get_env_var(app, 'HAL_USER_PASS')
-    db_user = get_env_var(app, 'DB_INSPIRE_USER')
-    db_pass = get_env_var(app, 'DB_INSPIRE_PASSWORD')
-    db_port = get_env_var(app, 'DB_PORT')
-    db_uri = get_env_var(app, 'PROD_DB_HOST')
-
-    limit = app.config.get('HAL_LIMIT', 0)
-    yield_amt = app.config.get('HAL_YIELD_AMT', 100)
+    limit = current_app.config.get('HAL_LIMIT', 0)
+    yield_amt = current_app.config.get('HAL_YIELD_AMT', 100)
 
     db_resource = 'postgresql+psycopg2://{}:{}@{}:{}/inspirehep'.\
         format(db_user, db_pass, db_uri, db_port)
 
-    app.config.update(
+    current_app.config.update(
         HAL_USER_NAME=username,
         HAL_USER_PASS=password,
         SQLALCHEMY_DATABASE_URI=db_resource
     )
 
     try:
-        with app.app_context():
-            hal_push(limit=limit, yield_amt=yield_amt)
+        hal_push(limit=limit, yield_amt=yield_amt)
 
     except Exception as e:
         print ('ERROR: cannot connect to DB. Quitting.')
         print ('Exception:\n\n' + e.message)
-
-
-if __name__ == '__main__':
-    hal()

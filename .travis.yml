@@ -29,8 +29,7 @@ before_install:
 
 install:
   - sudo service postgresql stop
-  - travis_retry pip install -r requirements.txt
-  - travis_retry pip install -e .
+  - travis_retry pip install -e .[all]
 
 script:
   - ./run-tests.sh

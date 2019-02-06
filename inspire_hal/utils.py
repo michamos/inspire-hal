@@ -26,7 +26,6 @@ from __future__ import absolute_import, division, print_function
 
 from itertools import chain
 
-from elasticsearch import RequestError
 from flask import current_app
 from sqlalchemy import tuple_
 
@@ -173,10 +172,7 @@ def _get_hal_id_map(record):
         record, 'authors.affiliations.record', default=[]))
     affiliation_recids = [get_recid_from_ref(el) for el in affiliation_records]
 
-    try:
-        institutions = get_db_records([('ins', affiliation_recids)])
-    except RequestError:
-        institutions = []
+    institutions = get_db_records([('ins', affiliation_recids)])
 
     return {el['control_number']: _get_hal_id(el) for el in institutions}
 
