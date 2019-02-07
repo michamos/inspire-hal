@@ -1,0 +1,6 @@
+tests
+docker*
+Dockerfile
+.gitignore
+.travis.yml
+
