@@ -53,7 +53,7 @@ install_requires = [
     'langdetect~=1.0,>=1.0.7',
     'redis~=2.0,>=2.10.6',
     'SQLAlchemy~=1.0,>=1.2.5',
-    'sword2~=0.0,>=0.2.1',
+    'sword2@git+https://github.com/inspirehep/python-client-sword2.git',
     'urllib3==1.23',
     'zulip==0.5.8',
 ]
