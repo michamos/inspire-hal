@@ -29,6 +29,7 @@ from langdetect import detect
 from langdetect.lang_detect_exception import LangDetectException
 
 from inspire_schemas.readers import ConferenceReader, LiteratureReader
+from inspire_utils.record import get_value
 
 from ..utils import (
     get_authors,
@@ -75,7 +76,6 @@ def _is_comm(record):
 
 def _get_comm_context(record):
     lit_reader = LiteratureReader(record)
-    conf_reader = ConferenceReader(record)
     abstract = lit_reader.abstract
     try:
         abstract_language = detect(abstract)
@@ -83,7 +83,8 @@ def _get_comm_context(record):
         abstract_language = ''
 
     conference_record = get_conference_record(record)
-    conference_title = LiteratureReader(conference_record).title
+    conference_title = get_value(conference_record, 'titles.title[0]')
+    conf_reader = ConferenceReader(conference_record)
 
     return {
         'abstract': abstract,
@@ -144,7 +145,8 @@ def _get_art_context(record):
         'journal_title': reader.journal_title,
         'journal_volume': reader.journal_volume,
         'keywords': reader.keywords,
-        'language': reader.get_page_artid(),
+        'language': reader.language,
+        'page_artid': reader.get_page_artid(),
         'peer_reviewed': 1 if reader.peer_reviewed else 0,
         'publication_date': reader.publication_date,
         'subtitle': reader.subtitle,

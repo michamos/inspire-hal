@@ -71,7 +71,6 @@ def _get_fixture(filename):
     )
 
 
-
 @pytest.fixture
 def create_record_from_fixture():
     def _create(pid_type, filename):

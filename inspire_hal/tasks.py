@@ -78,6 +78,6 @@ def send_to_zulip(message):
     }
     response = client.send_message(request)
     if response.get("result") == "success":
-        print ('New message sent to Zulip/ops/HAL_PUSH')
+        print('New message sent to Zulip/ops/HAL_PUSH')
     else:
         print("Error sending the message to Zulip: %s" % response)

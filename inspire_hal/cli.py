@@ -82,3 +82,4 @@ def push():
     except Exception as e:
         print ('ERROR: cannot connect to DB. Quitting.')
         print ('Exception:\n\n' + e.message)
+

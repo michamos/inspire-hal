@@ -24,17 +24,18 @@ from __future__ import absolute_import, division, print_function
 
 
 from inspire_schemas.api import load_schema, validate
-from inspire_hal.utils import get_conference_record
+from inspire_hal.utils import get_conference_record, _get_hal_id_map
 
 
 def test_get_conference_record(app, create_record_from_fixture, delete_record):
-    rec_fixture = create_record_from_fixture('con', 'get_conference_record.json')
+    rec_fixture = create_record_from_fixture('lit', 'get_conference_record.json')
+    expected_rec = create_record_from_fixture('con', 'expected_conference_record.json')
 
     schema = load_schema('hep')
     control_number_schema = schema['properties']['control_number']
     publication_info_schema = schema['properties']['publication_info']
 
-    conference_record = {'control_number': 972464}
+    conference_record = {'control_number': 1692403}
     assert validate(conference_record['control_number'], control_number_schema) is None
 
     record = {
@@ -48,9 +49,23 @@ def test_get_conference_record(app, create_record_from_fixture, delete_record):
     }
     assert validate(record['publication_info'], publication_info_schema) is None
 
-    expected = 972464
-
     result = get_conference_record(record)
-    assert expected == result['control_number']
+    assert expected_rec.json == result
 
     delete_record(rec_fixture.id)
+    delete_record(expected_rec.id)
+
+
+def test__get_hal_id_map(app, create_record_from_fixture, delete_record):
+    rec_fixture = create_record_from_fixture('lit', '_get_hal_id_map.json')
+    institution_fixture = create_record_from_fixture(
+        'ins', '_get_hal_id_map_institution.json'
+    )
+
+    result = _get_hal_id_map(rec_fixture.json)
+    expected = {912490: '53946'}
+
+    assert result == expected
+
+    delete_record(rec_fixture.id)
+    delete_record(institution_fixture.id)
