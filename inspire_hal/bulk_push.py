@@ -37,6 +37,8 @@ from __future__ import absolute_import, division, print_function
 import datetime
 import time
 
+from lxml import etree
+
 from invenio_records.models import RecordMetadata
 from inspire_hal.core.tei import convert_to_tei
 from inspire_hal.core.sword import create, update
@@ -77,10 +79,12 @@ def run(limit, yield_amt):
                             hal_id = id_['value']
 
                     if hal_id:
-                        update(tei.encode('utf8'), hal_id.encode('utf8'))
+                        rec, idd = tei.encode('utf8'), hal_id.encode('utf8')
+                        update(rec, idd)
                         print('UPD: %s %s\n' % (record['control_number'], hal_id))
                     else:
-                        receipt = create(tei.encode('utf8'))
+                        rec = tei.encode('utf8')
+                        receipt = create(rec)
                         print('NEW: %s %s\n' % (record['control_number'], receipt.id))
 
                     success = True
@@ -90,10 +94,22 @@ def run(limit, yield_amt):
                     continue
 
             if success:
-                print ('%s) OK %s\n' % (total, record['control_number']))
+                print('%s) OK %s\n' % (total, record['control_number']))
                 ok += 1
             else:
-                print('%s) EXC HAL: %s %s\n' % (total, record['control_number'], str(e)))
+
+                print(
+                    '%s) EXC HAL: %s %s\n' % (total, record['control_number'], format_error(e))
+                )
                 ko += 1
 
     return total + 1, now, ok, ko
+
+
+def format_error(exception):
+    try:
+        root = etree.fromstring(exception.content)
+        error = root.findall('.//{http://purl.org/net/sword/error/}verboseDescription')[0].text
+        return error
+    except Exception:
+        return exception

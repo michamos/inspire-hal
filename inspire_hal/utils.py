@@ -168,11 +168,12 @@ def get_domains(record):
 
 
 def _get_hal_id_map(record):
-    affiliation_records = chain.from_iterable(get_value(
-        record, 'authors.affiliations.record', default=[]))
-    affiliation_recids = [get_recid_from_ref(el) for el in affiliation_records]
+    affiliations = get_value(record, 'authors.affiliations.record', default=[])
+    affiliation_list = chain.from_iterable(affiliations)
+    affiliation_recids = [get_recid_from_ref(el) for el in affiliation_list]
 
-    institutions = get_db_records([('ins', affiliation_recids)])
+    pids = [('ins', pid) for pid in affiliation_recids]
+    institutions = get_db_records(pids)
 
     return {el['control_number']: _get_hal_id(el) for el in institutions}
 
