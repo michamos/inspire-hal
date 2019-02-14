@@ -104,6 +104,8 @@ setup(
     extras_require=extras_require,
     entry_points={
         "console_scripts": ["inspirehal = inspire_hal:cli"],
+        "invenio_config.module": ["inspirehal = inspire_hal.config"],
+
     },
     classifiers=[
         'Development Status :: 1 - Planning',

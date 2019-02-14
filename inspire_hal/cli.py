@@ -52,8 +52,9 @@ def hal():
 def push():
     """Push to HAL api.
 
-    By default the push is done to the HAL production environment.
-    If the --preprod flag is specified, the staging environment will be used.
+    By default the push is done to the HAL **preprod** environment.
+    To push to the production environment overwrite in the environment the
+    variables `APP_HAL_COL_IRI` and `HAL_EDIT_IRI`.
     """
     print('Loading credentials and settings from local environment')
 
@@ -64,6 +65,7 @@ def push():
     db_port = get_env_var('DB_PORT')
     db_uri = get_env_var('PROD_DB_HOST')
 
+    # Optional configurations
     limit = current_app.config.get('HAL_LIMIT', 0)
     yield_amt = current_app.config.get('HAL_YIELD_AMT', 100)
 

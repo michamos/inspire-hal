@@ -108,8 +108,11 @@ def run(limit, yield_amt):
 
 def format_error(exception):
     try:
-        root = etree.fromstring(exception.content)
-        error = root.findall('.//{http://purl.org/net/sword/error/}verboseDescription')[0].text
-        return error
+        if exception.content:
+            root = etree.fromstring(exception.content)
+            error = root.findall('.//{http://purl.org/net/sword/error/}verboseDescription')[0].text
+            return error
+        else:
+            return 'Error %d' % exception.response['status']
     except Exception:
         return exception
