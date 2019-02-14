@@ -42,3 +42,13 @@ Run tests
 To run `unit` and `integration` tests, just run
 
     $ ./run-tests.sh
+
+
+Publish to OpenShift
+--------------------
+
+Currently, there's not yet CI/CD setup for this repo.
+This means that once the code for a new image is ready, you need to
+
+     docker build -t gitlab-registry.cern.ch/inspire/images/hal-push .
+     docker push gitlab-registry.cern.ch/inspire/images/hal-push
