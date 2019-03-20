@@ -70,7 +70,7 @@ def update(tei, hal_id, doc_file=None):
 
 
 class HttpLib2LayerIgnoreCert(HttpLib2Layer):
-    def __init__(self, cache_dir, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(HttpLib2LayerIgnoreCert, self).__init__(*args, **kwargs)
         self.h = httplib2.Http(
             disable_ssl_certificate_validation=True
