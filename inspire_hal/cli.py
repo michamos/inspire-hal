@@ -23,6 +23,7 @@
 """INSPIRE-HAL cli."""
 from __future__ import absolute_import, division, print_function
 
+import os
 import sys
 
 import click
@@ -64,6 +65,7 @@ def push():
     db_pass = get_env_var('DB_INSPIRE_PASSWORD')
     db_port = get_env_var('DB_PORT')
     db_uri = get_env_var('PROD_DB_HOST')
+    connection_timeout = get_env_var('HAL_CONNECTION_TIMEOUT')
 
     # Optional configurations
     limit = current_app.config.get('HAL_LIMIT', 0)
@@ -75,7 +77,8 @@ def push():
     current_app.config.update(
         HAL_USER_NAME=username,
         HAL_USER_PASS=password,
-        SQLALCHEMY_DATABASE_URI=db_resource
+        SQLALCHEMY_DATABASE_URI=db_resource,
+        HAL_CONNECTION_TIMEOUT=connection_timeout
     )
 
     try:

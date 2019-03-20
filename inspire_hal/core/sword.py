@@ -73,8 +73,11 @@ class HttpLib2LayerIgnoreCert(HttpLib2Layer):
     def __init__(self, cache_dir):
         super(HttpLib2LayerIgnoreCert, self).__init__()
         self.h = httplib2.Http(
-            cache_dir, timeout=30.0, ca_certs=None,
-            disable_ssl_certificate_validation=True)
+            cache_dir,
+            timeout=current_app.config['HAL_CONNECTION_TIMEOUT'],
+            ca_certs=None,
+            disable_ssl_certificate_validation=True
+        )
 
 
 def _new_connection():

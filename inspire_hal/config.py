@@ -99,3 +99,7 @@ Note:
 
 HAL_IGNORE_CERTIFICATES = False
 """Whether to check certificates when connecting to HAL."""
+
+
+HAL_CONNECTION_TIMEOUT = 30
+"""Timeout for HAL connection"""
