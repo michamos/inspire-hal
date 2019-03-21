@@ -71,16 +71,16 @@ def update(tei, hal_id, doc_file=None):
 
 class HttpLib2LayerIgnoreCert(HttpLib2Layer):
     def __init__(self, *args, **kwargs):
-        self.h = httplib2.Http( *args, **kwargs)
+        self.h = httplib2.Http(*args, **kwargs)
 
 
 def _new_connection():
     user_name = current_app.config['HAL_USER_NAME']
     user_pass = current_app.config['HAL_USER_PASS']
     timeout = current_app.config['HAL_CONNECTION_TIMEOUT']
-    ignore_cert = current_app.config['HAL_IGNORE_CERTIFICATES']
+    ignore_cert = current_app.config.get('HAL_IGNORE_CERTIFICATES', False)
     http_impl = HttpLib2LayerIgnoreCert(
-        '.cache', timeout=timeout, disable_ssl_certificate_validation=not ignore_cert
+        '.cache', timeout=timeout, disable_ssl_certificate_validation=ignore_cert
     )
 
 
