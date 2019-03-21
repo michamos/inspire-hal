@@ -33,15 +33,6 @@ from flask.cli import with_appcontext
 from inspire_hal.tasks import hal_push
 
 
-def get_env_var(var_name):
-    try:
-        value = current_app.config[var_name]
-        return value
-    except KeyError:
-        print("Environment variable '{}' not set. Quitting.".format(var_name))
-        sys.exit(1)
-
-
 @click.group()
 def hal():
     pass
@@ -56,27 +47,9 @@ def push():
     To push to the production environment overwrite in the environment the
     variables `APP_HAL_COL_IRI` and `HAL_EDIT_IRI`.
     """
-    print('Loading credentials and settings from local environment')
-
-    username = get_env_var('HAL_USER_NAME')
-    password = get_env_var('HAL_USER_PASS')
-    db_user = get_env_var('DB_INSPIRE_USER')
-    db_pass = get_env_var('DB_INSPIRE_PASSWORD')
-    db_port = get_env_var('DB_PORT')
-    db_uri = get_env_var('PROD_DB_HOST')
-
     # Optional configurations
     limit = current_app.config.get('HAL_LIMIT', 0)
     yield_amt = current_app.config.get('HAL_YIELD_AMT', 100)
-
-    db_resource = 'postgresql+psycopg2://{}:{}@{}:{}/inspirehep'.\
-        format(db_user, db_pass, db_uri, db_port)
-
-    current_app.config.update(
-        HAL_USER_NAME=username,
-        HAL_USER_PASS=password,
-        SQLALCHEMY_DATABASE_URI=db_resource
-    )
 
     try:
         hal_push(limit=limit, yield_amt=yield_amt)
