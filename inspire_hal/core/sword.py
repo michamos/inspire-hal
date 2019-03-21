@@ -70,24 +70,23 @@ def update(tei, hal_id, doc_file=None):
 
 
 class HttpLib2LayerIgnoreCert(HttpLib2Layer):
-    def __init__(self, cache_dir):
-        super(HttpLib2LayerIgnoreCert, self).__init__()
-        self.h = httplib2.Http(
-            cache_dir, timeout=30.0, ca_certs=None,
-            disable_ssl_certificate_validation=True)
+    def __init__(self, *args, **kwargs):
+        self.h = httplib2.Http(*args, **kwargs)
 
 
 def _new_connection():
     user_name = current_app.config['HAL_USER_NAME']
     user_pass = current_app.config['HAL_USER_PASS']
+    timeout = current_app.config['HAL_CONNECTION_TIMEOUT']
+    ignore_cert = current_app.config.get('HAL_IGNORE_CERTIFICATES', False)
+    http_impl = HttpLib2LayerIgnoreCert(
+        '.cache', timeout=timeout, disable_ssl_certificate_validation=ignore_cert
+    )
 
-    if current_app.config['HAL_IGNORE_CERTIFICATES']:
-        http_impl = HttpLib2LayerIgnoreCert('.cache')
-    else:
-        http_impl = HttpLib2Layer('.cache')
 
     return Connection(
-        '', user_name=user_name, user_pass=user_pass, http_impl=http_impl)
+        '', user_name=user_name, user_pass=user_pass, http_impl=http_impl
+    )
 
 
 def _create_payload(tei, doc_file):
