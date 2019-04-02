@@ -69,29 +69,28 @@ def run(limit, yield_amt):
                 continue
 
             success = False
-            for _ in range(2):
-                try:
-                    hal_id = ''
-                    ids = record.get('external_system_identifiers', [])
 
-                    for id_ in ids:
-                        if id_['schema'] == 'HAL':
-                            hal_id = id_['value']
+            try:
+                hal_id = ''
+                ids = record.get('external_system_identifiers', [])
 
-                    if hal_id:
-                        rec, idd = tei.encode('utf8'), hal_id.encode('utf8')
-                        update(rec, idd)
-                        print('UPD: %s %s\n' % (record['control_number'], hal_id))
-                    else:
-                        rec = tei.encode('utf8')
-                        receipt = create(rec)
-                        print('NEW: %s %s\n' % (record['control_number'], receipt.id))
+                for id_ in ids:
+                    if id_['schema'] == 'HAL':
+                        hal_id = id_['value']
 
-                    success = True
-                    break
+                if hal_id:
+                    rec, idd = tei.encode('utf8'), hal_id.encode('utf8')
+                    update(rec, idd)
+                    print('UPD: %s %s\n' % (record['control_number'], hal_id))
+                else:
+                    rec = tei.encode('utf8')
+                    receipt = create(rec)
+                    print('NEW: %s %s\n' % (record['control_number'], receipt.id))
 
-                except Exception as e:
-                    continue
+                success = True
+
+            except Exception as e:
+                pass
 
             if success:
                 print('%s) OK %s\n' % (total, record['control_number']))
