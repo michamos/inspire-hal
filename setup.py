@@ -40,8 +40,8 @@ install_requires = [
     'Flask~=0.0,>=0.12.4',
     'Flask-CeleryExt~=0.0,>=0.3.1',
     'httplib2~=0.0,>=0.12.0',
-    'inspire-dojson~=61.0,>=61.0.0',
-    'inspire-schemas~=59.0,>=59.2.0',
+    'inspire-dojson~=62.0,>=62.0.0',
+    'inspire-schemas~=60.0,>=60.0.0',
     'inspire-utils~=3.0,>=3.0.0',
     'flask-shell-ipython<0.4.0',
     'invenio-app~=1.0,>=1.0.0',
@@ -54,7 +54,7 @@ install_requires = [
     'redis~=2.0,>=2.10.6',
     'SQLAlchemy~=1.0,>=1.2.5',
     'sword2@git+https://github.com/inspirehep/python-client-sword2.git',
-    'urllib3==1.23',
+    'urllib3==1.24.1',
     'zulip==0.5.8',
 ]
 

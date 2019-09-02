@@ -39,6 +39,9 @@ from ..utils import (
 )
 
 
+ARTICLE_LIKE_DOCUMENT_TYPES = {'activity report', 'article', 'note', 'report'}
+
+
 def convert_to_tei(record):
     """Return the record formatted in XML+TEI per HAL's specification.
 
@@ -119,7 +122,7 @@ def _is_art(record):
     document_types = reader.document_types
     published = reader.is_published
 
-    return 'article' in document_types and published
+    return ARTICLE_LIKE_DOCUMENT_TYPES.intersection(document_types) and published
 
 
 def _get_art_context(record):
@@ -156,7 +159,7 @@ def _get_art_context(record):
 
 def _is_preprint(record):
     document_types = LiteratureReader(record).document_types
-    return 'article' in document_types
+    return ARTICLE_LIKE_DOCUMENT_TYPES.intersection(document_types)
 
 
 def _get_preprint_context(record):
