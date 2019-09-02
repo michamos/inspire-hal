@@ -23,7 +23,7 @@
 from __future__ import absolute_import, division, print_function
 
 from inspire_schemas.api import load_schema, validate
-from inspire_hal.core.tei import _is_art, _is_comm
+from inspire_hal.core.tei import _is_art, _is_comm, _is_preprint
 
 
 def test_is_art():
@@ -34,6 +34,30 @@ def test_is_art():
     record = {
         'document_type': [
             'article',
+        ],
+        'publication_info': [
+            {
+                'journal_issue': '2',
+                'journal_title': 'Phys.Part.Nucl.Lett.',
+                'journal_volume': '14',
+                'page_start': '336',
+            },
+        ],
+    }
+    assert validate(record['document_type'], document_type_schema) is None
+    assert validate(record['publication_info'], publication_info_schema) is None
+
+    assert _is_art(record)
+
+
+def test_is_art_accepts_reports():
+    schema = load_schema('hep')
+    document_type_schema = schema['properties']['document_type']
+    publication_info_schema = schema['properties']['publication_info']
+
+    record = {
+        'document_type': [
+            'report',
         ],
         'publication_info': [
             {
@@ -62,3 +86,17 @@ def test_is_comm():
     assert validate(record['document_type'], subschema) is None
 
     assert _is_comm(record)
+
+
+def test_is_preprint():
+    schema = load_schema('hep')
+    document_type_schema = schema['properties']['document_type']
+
+    record = {
+        'document_type': [
+            'article',
+        ],
+    }
+    assert validate(record['document_type'], document_type_schema) is None
+
+    assert _is_preprint(record)
