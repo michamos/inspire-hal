@@ -1,7 +1,6 @@
 language: python
 python:
 - 2.7
-- 3.6
 before_install:
 - travis_retry pip install --upgrade pip setuptools
 - travis_retry pip install coveralls
