@@ -3,7 +3,7 @@
 {% block notesStmt %}
 <notesStmt>
   <note type="audience" n="2"/>
-  <note type="peer" n="{{ peer_reviewed }}"/>
+  <note type="peer" n="1"/>
   <note type="popular" n="{{ divulgation }}"/>
 </notesStmt>
 {% endblock notesStmt %}
