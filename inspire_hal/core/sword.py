@@ -52,7 +52,11 @@ def create(tei, doc_file=None):
 
 def update(tei, hal_id, doc_file=None):
     """Update a record on HAL using the SWORD2 protocol."""
-    connection = _new_connection()
+    override_headers = {}
+    if current_app.config.get('HAL_DISABLE_AFFILIATION_UPDATE'):
+        override_headers['LoadFilter'] = 'noaffiliation'
+
+    connection = _new_connection(override_headers=override_headers)
     payload, mimetype, filename = _create_payload(tei, doc_file)
 
     edit_iri = current_app.config['HAL_EDIT_IRI'] + hal_id
@@ -69,18 +73,30 @@ def update(tei, hal_id, doc_file=None):
     )
 
 
-class HttpLib2LayerIgnoreCert(HttpLib2Layer):
-    def __init__(self, *args, **kwargs):
+class HttpLib2LayerWithCustomOptions(HttpLib2Layer):
+    def __init__(self, override_headers=None, *args, **kwargs):
         self.h = httplib2.Http(*args, **kwargs)
+        self.override_headers = override_headers
+
+    def request(self, uri, method, headers=None, payload=None):
+        if self.override_headers:
+            headers = headers.copy()
+            headers.update(self.override_headers)
+        return super(HttpLib2LayerWithCustomOptions, self).request(
+            uri=uri, method=method, headers=headers, payload=payload
+        )
 
 
-def _new_connection():
+def _new_connection(override_headers=None):
     user_name = current_app.config['HAL_USER_NAME']
     user_pass = current_app.config['HAL_USER_PASS']
     timeout = current_app.config['HAL_CONNECTION_TIMEOUT']
     ignore_cert = current_app.config.get('HAL_IGNORE_CERTIFICATES', False)
-    http_impl = HttpLib2LayerIgnoreCert(
-        '.cache', timeout=timeout, disable_ssl_certificate_validation=ignore_cert
+    http_impl = HttpLib2LayerWithCustomOptions(
+        '.cache',
+        timeout=timeout,
+        disable_ssl_certificate_validation=ignore_cert,
+        override_headers=override_headers
     )
 
 

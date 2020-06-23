@@ -103,3 +103,7 @@ HAL_IGNORE_CERTIFICATES = False
 
 HAL_CONNECTION_TIMEOUT = 30
 """Timeout for HAL connection"""
+
+
+HAL_DISABLE_AFFILIATION_UPDATE = False
+"""Whether to disable updating affiliations when updating records."""
